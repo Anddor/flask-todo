@@ -1,5 +1,5 @@
-function getStarIcon(isStarred) {
-    if (isStarred) {
+function getStarIcon(isFav) {
+    if (isFav) {
         return "bi-star-fill"
     } else {
         return "bi-star"
@@ -26,26 +26,19 @@ function deleteTask(taskId) {
 }
 
 function updateStarred(taskId, oldValue) {
-    const taskElement = document.getElementById(`task-${taskId}`);
-
     // Update Model
     fetch(`../api/todos/${taskId}`,
     {
         method: "PUT",
         headers: new Headers({"Content-Type": "application/json"}),
         body: JSON.stringify({
-            task: taskElement.dataset.taskText, // existing value?
             starred: !oldValue
         })
     }).then(
         response => {
             if (response.status == 200) {
-                // Delete success, update View:
-                response.json().then(
-                    json => {
-                        refreshTaskList(); // YOLO
-                    }
-                )
+                // Update success, update View:
+                refreshTaskList(); // YOLO    
             }
         }
     )
@@ -66,7 +59,7 @@ function updateViewWithListItem(view, modelElement) {
             <p>${modelElement.task}</p>
         </div>
         <div>
-            <button class="btn" type="button" onclick="updateStarred(${modelElement.id}, ${modelElement.starred})"><i class="bi ${getStarIcon(modelElement.starred)}"></i></button>
+            <button class="btn" type="button" onclick="updateStarred(${modelElement.id}, ${modelElement.fav})"><i class="bi ${getStarIcon(modelElement.fav)}"></i></button>
         </div>
         <div>
             <button class="btn" type="button" onclick="deleteTask(${modelElement.id})"><i class="bi bi-trash3"></i></button>
