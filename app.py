@@ -1,6 +1,4 @@
-import contextlib
 import os
-import sqlite3
 
 from flask import Flask, request, send_from_directory
 from werkzeug.utils import safe_join

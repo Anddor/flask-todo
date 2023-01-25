@@ -7,7 +7,8 @@ DATABASE_FILE = 'database.db'
 
 class TodoDAO(object):
     def __init__(self):
-        self.setup_database()
+        # self.setup_database()
+        pass
 
     """
     Kjører SQL-spørringen 'statement' med gitte verdi-bindinger 'values'
@@ -53,32 +54,31 @@ class TodoDAO(object):
         if not os._exists(DATABASE_FILE):  # python compatiblity
             # OPPGAVE: Skriv SQL som oppretter en tabell med feltene i en todo:
 
-            self._execute_sql('''CREATE TABLE ...
-            )''', {})
+            self._execute_sql('''CREATE TABLE todo (id INTEGER PRIMARY KEY, task TEXT, fav INTEGER)
+            ''', {})
 
     def get_all(self):
         return_list = []
-        # OPPGAVE: Skriv SQL som hentesr alle radene i todo tabellen
+        # fetch all todos from database
 
-        todos = self._execute_sql_fetchall('''
-        SELECT ...
-        ''', {})  # todo convert to json? marshal? ORM?
+        todos = self._execute_sql_fetchall(
+            '''SELECT id, task, fav FROM todo''', {})
         for todo in todos:
-            return_list.append(self.map_todo(todo))
+            return_list.append(self._map_todo(todo))
         return return_list
 
     def get(self, id):
 
-        # OPPGAVE: Skriv SQL som henter todo-raden med den gitte id-en
-        todo = self._execute_sql('''
-        SELECT ...''', {'id': id})
-        return self.map_todo(todo)
+        # fetch the todo with the given id
+        todo = self._execute_sql('''SELECT id, task, fav FROM todo WHERE id = :id''',
+                                 {'id': id})
+        return self._map_todo(todo)
 
     def create(self, data):
         todo = data
         # OPPGAVE: Skriv SQL som setter inn en ny rad i todo tabellen
         todo_id = self._execute_sql_lastrowid('''
-        INSERT ...
+        INSERT INTO todo (task, fav) VALUES (:task, :fav)
         ''', data)
 
         todo['id'] = todo_id
@@ -87,12 +87,12 @@ class TodoDAO(object):
     def update(self, id, data):
         # OPPGAVE: Skriv SQL som oppdaterer den gitte raden i tabellen
         self._execute_sql('''
-        UPDATE ...
+        UPDATE todo SET task = :task, fav = :fav WHERE id = :id
         ''', data)
         return data
 
     def delete(self, id):
         # OPPGAVE: Skriv SQL som sletter den gitte raden i tabellen
         self._execute_sql('''
-        DELETE ...
+        DELETE FROM todo WHERE id = :id
         ''', {'id': id})
