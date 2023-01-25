@@ -1,0 +1,16 @@
+@startuml diagram
+
+[Client] as c
+c -> HTTP    : request / response
+
+package server@heroku {
+    [Flask App] as fa
+    [Gunicorn] as g
+    [SQLite] as db
+
+    () HTTP -> g
+    g -> fa
+    fa -> db : query
+}
+
+@enduml
