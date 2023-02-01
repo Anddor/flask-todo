@@ -86,6 +86,7 @@ class TodoDAO(object):
 
     def update(self, id, data):
         # OPPGAVE: Skriv SQL som oppdaterer den gitte raden i tabellen
+        data['id'] = id
         self._execute_sql('''
         UPDATE todo SET task = :task, fav = :fav WHERE id = :id
         ''', data)
