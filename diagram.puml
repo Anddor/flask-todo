@@ -1,16 +1,20 @@
 @startuml diagram
 
 [Client] as c
-c -> HTTP    : request / response
+actor user
 
 package server@heroku {
     [Flask App] as fa
     [Gunicorn] as g
     [SQLite] as db
+    () HTTP as h
 
-    () HTTP -> g
+    h -> g
     g -> fa
     fa -> db : query
 }
+
+c -> h    : request / response
+user -> c : use
 
 @enduml
