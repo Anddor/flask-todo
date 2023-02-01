@@ -25,14 +25,15 @@ function deleteTask(taskId) {
 
 }
 
-function updateStarred(taskId, oldValue) {
+function update(taskId, task, fav) {
     // Update Model
     fetch(`../api/todos/${taskId}`,
     {
         method: "PUT",
         headers: new Headers({"Content-Type": "application/json"}),
         body: JSON.stringify({
-            starred: !oldValue
+            task: task,
+            fav: fav
         })
     }).then(
         response => {
@@ -59,7 +60,7 @@ function updateViewWithListItem(view, modelElement) {
             <p>${modelElement.task}</p>
         </div>
         <div>
-            <button class="btn" type="button" onclick="updateStarred(${modelElement.id}, ${modelElement.fav})"><i class="bi ${getStarIcon(modelElement.fav)}"></i></button>
+            <button class="btn" type="button" onclick="update(${modelElement.id}, '${modelElement.task}', ${!modelElement.fav})"><i class="bi ${getStarIcon(modelElement.fav)}"></i></button>
         </div>
         <div>
             <button class="btn" type="button" onclick="deleteTask(${modelElement.id})"><i class="bi bi-trash3"></i></button>
