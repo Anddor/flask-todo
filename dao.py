@@ -28,7 +28,10 @@ class TodoDAO(object):
     """
 
     def _execute_sql_fetchall(self, statement, values):
-        fetch, _ = self._execute_sql(statement, values)
+        try:
+            fetch, _ = self._execute_sql(statement, values)
+        except:
+            self.setup_database()
         return fetch
 
     """
@@ -36,7 +39,10 @@ class TodoDAO(object):
     """
 
     def _execute_sql_lastrowid(self, statement, values):
-        _, lastrow = self._execute_sql(statement, values)
+        try:
+            _, lastrow = self._execute_sql(statement, values)
+        except:
+            self.setup_database()
         return lastrow
 
     def _map_todo(self, todo_row):
