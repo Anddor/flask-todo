@@ -51,8 +51,11 @@ class TodoDAO(object):
     """
 
     def setup_database(self):
-        self._execute_sql('''CREATE TABLE todo (id INTEGER PRIMARY KEY, task TEXT, fav INTEGER)
-        ''', {})
+        try:
+            self._execute_sql('''CREATE TABLE todo (id INTEGER PRIMARY KEY, task TEXT, fav INTEGER)
+            ''', {})
+        except:
+            pass
 
     def get_all(self):
         return_list = []
