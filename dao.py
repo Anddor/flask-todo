@@ -7,7 +7,7 @@ DATABASE_FILE = 'database.db'
 
 class TodoDAO(object):
     def __init__(self):
-        # self.setup_database()
+        self.setup_database()
         pass
 
     """
@@ -51,11 +51,8 @@ class TodoDAO(object):
     """
 
     def setup_database(self):
-        if not os._exists(DATABASE_FILE):  # python compatiblity
-            # OPPGAVE: Skriv SQL som oppretter en tabell med feltene i en todo:
-
-            self._execute_sql('''CREATE TABLE todo (id INTEGER PRIMARY KEY, task TEXT, fav INTEGER)
-            ''', {})
+        self._execute_sql('''CREATE TABLE todo (id INTEGER PRIMARY KEY, task TEXT, fav INTEGER)
+        ''', {})
 
     def get_all(self):
         return_list = []
