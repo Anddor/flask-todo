@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask, request, send_from_directory
+import flask
 from werkzeug.utils import safe_join
 from flask_restx import Api, Resource, fields, marshal
 
@@ -45,7 +46,9 @@ class TodoList(Resource):
     @ns.marshal_list_with(todo)
     def get(self):
         '''List all tasks'''
-        return DAO.get_all()
+        resp = flask.Reponse(DAO.get_all())
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp
 
     @ns.doc('create_todo')
     @ns.expect(todo)
