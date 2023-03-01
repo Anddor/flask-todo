@@ -17,6 +17,7 @@ class TodoDAO(object):
     def _execute_sql(self, statement, values):
         with contextlib.closing(sqlite3.connect(DATABASE_FILE)) as conn:  # auto-closes
             with conn:  # auto-commits
+                conn.row_factory = sqlite3.Row  # wrap for named columns
                 with contextlib.closing(conn.cursor()) as cursor:  # auto-closes
                     cursor.execute(statement, values)
                     fetch = cursor.fetchall()
@@ -39,13 +40,6 @@ class TodoDAO(object):
         _, lastrow = self._execute_sql(statement, values)
         return lastrow
 
-    def _map_todo(self, todo_row):
-        return {
-            'id': todo_row[0],
-            'task': todo_row[1],
-            'fav': todo_row[2]
-        }
-
     """
     Opprett tabeller i databasen om database-filen ikke finnes fra før.
     """
@@ -58,21 +52,17 @@ class TodoDAO(object):
             pass
 
     def get_all(self):
-        return_list = []
         # fetch all todos from database
 
         todos = self._execute_sql_fetchall(
             '''SELECT id, task, fav FROM todo''', {})
-        for todo in todos:
-            return_list.append(self._map_todo(todo))
-        return return_list
+        return todos
 
     def get(self, id):
 
         # fetch the todo with the given id
-        todo = self._execute_sql('''SELECT id, task, fav FROM todo WHERE id = :id''',
+        return self._execute_sql('''SELECT id, task, fav FROM todo WHERE id = :id''',
                                  {'id': id})
-        return self._map_todo(todo)
 
     def create(self, data):
         todo = data
