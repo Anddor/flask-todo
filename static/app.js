@@ -39,22 +39,14 @@ function update(taskId, task, fav) {
         response => {
             if (response.status == 200) {
                 // Update success, update View:
-                refreshTaskList(); // YOLO    
+                getAllTasks(); // YOLO    
             }
         }
     )
 }
 
-
-function updateViewWithListItem(modelElement) {
-    const list = document.getElementById('task-list');
-    updateViewWithListItem(list, modelElement);
-}
-
-function updateViewWithListItem(view, modelElement) {
-
-    view.innerHTML += 
-    `
+function modelToHTML(modelElement) {
+    return `
     <div class="list-group-item d-flex flex-row justify-content-between" id="task-${modelElement.id}" data-task-id="${modelElement.id}" data-task-text="${modelElement.task}">
         <div>
             <p>${modelElement.task}</p>
@@ -65,8 +57,7 @@ function updateViewWithListItem(view, modelElement) {
         <div>
             <button class="btn" type="button" onclick="deleteTask(${modelElement.id})"><i class="bi bi-trash3"></i></button>
         </div>
-    </div>
-    `
+    </div>`
 }
 
 // UPDATE MODEL
@@ -87,7 +78,7 @@ function submitTask() {
         if (response.status === 201) {
             response.json().then(
                 json => {
-                    updateViewWithListItem(list, json)
+                    list.innerHTML += modelToHTML(json);
                 }
             )
             taskInput.value = "";
@@ -95,8 +86,8 @@ function submitTask() {
     });
 }
 
-// UPDATE VIEW
-function refreshTaskList() {
+// UPDATE VIEW FROM MODEL
+function getAllTasks() {
     console.log("Fetching task list")
     const list = document.getElementById('task-list');
 
@@ -107,7 +98,7 @@ function refreshTaskList() {
                     json => {
                         list.innerHTML = ''; // reset list of tasks
                         json.forEach(function (element) {
-                            updateViewWithListItem(list, element)
+                            list.innerHTML += modelToHTML(list, element)
                     });
                 });
             }
@@ -116,4 +107,4 @@ function refreshTaskList() {
 
 }
 
-window.onload = function (){refreshTaskList()};
+window.onload = function (){getAllTasks()};
