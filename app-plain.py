@@ -1,14 +1,24 @@
 import os
 
 from flask import Flask, jsonify, request, send_from_directory
+from memDao import MemDAO
 from werkzeug.utils import safe_join
 
-from dao import TodoDAO
+from dbDao import TodoDAO
+from daoInterface import DaoInterface
 
 static = safe_join(os.path.dirname(__file__), 'static')
 
 app = Flask(__name__)
-DAO = TodoDAO()
+
+DAO = None  # type: DaoInterface
+dao_to_use = os.getenv('DAO', 'mem')
+if dao_to_use == 'mem':
+    DAO = MemDAO()
+elif dao_to_use == 'db':
+    DAO = TodoDAO()
+else:
+    raise Exception('Unknown dao setting: ' + dao_to_use, dao_to_use)
 
 
 @app.route('/')
@@ -41,7 +51,7 @@ def create_todo():
     if 'fav' not in json:
         json['fav'] = False
 
-    return DAO.create(json), 201
+    return DAO.insert(json), 201
 
 
 @app.route('/api/todos/<int:id>', methods=['GET'])
@@ -58,7 +68,7 @@ def delete_todo(id):
 
 
 @app.route('/api/todos/<int:id>', methods=['PUT'])
-def update_todo():
+def update_todo(id):
     print('update_todo')
     return DAO.update(id, request.json)
 

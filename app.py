@@ -4,7 +4,7 @@ from flask import Flask, request, send_from_directory
 from werkzeug.utils import safe_join
 from flask_restx import Api, Resource, fields, marshal
 
-from dao import TodoDAO
+from dbDao import TodoDAO
 
 static = safe_join(os.path.dirname(__file__), 'static')
 
@@ -53,7 +53,7 @@ class TodoList(Resource):
     def post(self):
         '''Create a new task'''
         marshalled = marshal(api.payload, todo)
-        return DAO.create(marshalled), 201
+        return DAO.insert(marshalled), 201
 
 
 @ns.route('/<int:id>')

@@ -2,10 +2,12 @@ import contextlib
 import os
 import sqlite3
 
+from daoInterface import DaoInterface
+
 DATABASE_FILE = 'database.db'
 
 
-class TodoDAO(object):
+class TodoDAO(DaoInterface):
     def __init__(self):
         self.setup_database()
         pass
@@ -70,7 +72,7 @@ class TodoDAO(object):
                                  {'id': id})
         return self._map_row(todo)
 
-    def create(self, data):
+    def insert(self, data):
         todo = data
         # OPPGAVE: Skriv SQL som setter inn en ny rad i todo tabellen
         todo_id = self._execute_sql_lastrowid('''
