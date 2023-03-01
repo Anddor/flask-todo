@@ -40,6 +40,11 @@ class TodoDAO(object):
         _, lastrow = self._execute_sql(statement, values)
         return lastrow
 
+    def _map_row(self, row):
+        return dict(row)
+
+    def _map_rows(self, rows):
+        return [dict(row) for row in rows]
     """
     Opprett tabeller i databasen om database-filen ikke finnes fra før.
     """
@@ -56,13 +61,14 @@ class TodoDAO(object):
 
         todos = self._execute_sql_fetchall(
             '''SELECT id, task, fav FROM todo''', {})
-        return todos
+        return self._map_rows(todos)
 
     def get(self, id):
 
         # fetch the todo with the given id
-        return self._execute_sql('''SELECT id, task, fav FROM todo WHERE id = :id''',
+        todo = self._execute_sql('''SELECT id, task, fav FROM todo WHERE id = :id''',
                                  {'id': id})
+        return self._map_row(todo)
 
     def create(self, data):
         todo = data
