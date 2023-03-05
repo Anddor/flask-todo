@@ -6,48 +6,9 @@ function getStarIcon(isFav) {
     }
 }
 
-
-function deleteTask(taskId) {
-    const taskElement = document.querySelectorAll(`[data-task-id="${taskId}"]`)[0];
-
-    // Update Model
-    fetch(`../api/todos/${taskId}`,
-    {
-        method: "DELETE"
-    }).then(
-        response => {
-            if (response.status == 204) {
-                // Delete success, update view:
-                taskElement.remove();
-            }
-        }
-    )
-
-}
-
-function update(taskId, task, fav) {
-    // Update Model
-    fetch(`../api/todos/${taskId}`,
-    {
-        method: "PUT",
-        headers: new Headers({"Content-Type": "application/json"}),
-        body: JSON.stringify({
-            task: task,
-            fav: fav
-        })
-    }).then(
-        response => {
-            if (response.status == 200) {
-                // Update success, update View:
-                getAllTasks(); // YOLO    
-            }
-        }
-    )
-}
-
 function modelToHTML(modelElement) {
     return `
-    <div class="list-group-item d-flex flex-row justify-content-between" id="task-${modelElement.id}" data-task-id="${modelElement.id}" data-task-text="${modelElement.task}">
+    <div class="list-group-item d-flex flex-row justify-content-between">
         <div>
             <p>${modelElement.task}</p>
         </div>
@@ -58,6 +19,29 @@ function modelToHTML(modelElement) {
             <button class="btn" type="button" onclick="deleteTask(${modelElement.id})"><i class="bi bi-trash3"></i></button>
         </div>
     </div>`
+}
+
+
+// UPDATE VIEW FROM MODEL
+function getAllTasks() {
+    console.log("Fetching task list")
+    const list = document.getElementById('task-list');
+
+    fetch('../api/todos').then(
+        response => {
+            if (response.status === 200) {
+                response.json().then(
+                    json => {
+                        list.innerHTML = ''; // reset list of tasks
+                        json.forEach(function (element) {
+                            list.innerHTML += modelToHTML(element)
+                        });
+                    }
+                );
+            } else {
+                console.log("Error fetching task list: " + response.status)
+            }
+    });
 }
 
 // UPDATE MODEL
@@ -82,29 +66,49 @@ function submitTask() {
                 }
             )
             taskInput.value = "";
+        } else {
+            console.log("Error creating task: " + response.status)
         }
     });
 }
 
-// UPDATE VIEW FROM MODEL
-function getAllTasks() {
-    console.log("Fetching task list")
-    const list = document.getElementById('task-list');
-
-    fetch('../api/todos').then(
+function update(taskId, task, fav) {
+    // Update Model
+    fetch(`../api/todos/${taskId}`,
+    {
+        method: "PUT",
+        headers: new Headers({"Content-Type": "application/json"}),
+        body: JSON.stringify({
+            task: task,
+            fav: fav
+        })
+    }).then(
         response => {
-            if (response.status === 200) {
-                response.json().then(
-                    json => {
-                        list.innerHTML = ''; // reset list of tasks
-                        json.forEach(function (element) {
-                            list.innerHTML += modelToHTML(element)
-                    });
-                });
+            if (response.status == 200) {
+                // Update success, update View:
+                getAllTasks();
+            } else {
+                console.log("Error updating task: " + response.status)
             }
-    });
+        }
+    )
+}
 
-
+function deleteTask(taskId) {
+    // Update Model
+    fetch(`../api/todos/${taskId}`,
+    {
+        method: "DELETE"
+    }).then(
+        response => {
+            if (response.status == 204) {
+                // Delete success, update view:
+                getAllTasks();
+            } else {
+                console.log("Error deleting task: " + response.status)
+            }
+        }
+    )
 }
 
 window.onload = function (){getAllTasks()};
