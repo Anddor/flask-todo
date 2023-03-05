@@ -21,7 +21,7 @@ else:
     raise Exception('Unknown dao setting: ' + dao_to_use, dao_to_use)
 
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def _home():
     """Serve index.html at the root url"""
     print('home')
@@ -29,7 +29,7 @@ def _home():
     return send_from_directory(static, 'index.html')
 
 
-@app.route('/<path:path>')
+@app.route('/<path:path>', methods=['GET'])
 def _static(path):
     """Serve content from the static directory"""
     print('static')

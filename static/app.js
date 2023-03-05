@@ -98,7 +98,7 @@ function getAllTasks() {
                     json => {
                         list.innerHTML = ''; // reset list of tasks
                         json.forEach(function (element) {
-                            list.innerHTML += modelToHTML(list, element)
+                            list.innerHTML += modelToHTML(element)
                     });
                 });
             }
