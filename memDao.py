@@ -10,7 +10,7 @@ class MemDAO(DaoInterface):
 
     def get_all(self):
         # fetch all todos from database
-        todos = self.todos.values()
+        todos = list(self.todos.values())
         return todos
 
     def get(self, id):
