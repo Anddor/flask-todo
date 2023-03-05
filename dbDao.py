@@ -7,7 +7,7 @@ from daoInterface import DaoInterface
 DATABASE_FILE = 'database.db'
 
 
-class TodoDAO(DaoInterface):
+class DbDAO(DaoInterface):
     def __init__(self):
         self.setup_database()
         pass

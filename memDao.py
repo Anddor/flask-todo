@@ -42,6 +42,5 @@ class MemDAO(DaoInterface):
 
     def delete(self, id):
         # delete todo
-        # TODO gets key error, why?
         print(self.todos.items())
         del self.todos[id]

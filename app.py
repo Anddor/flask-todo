@@ -4,7 +4,7 @@ from flask import Flask, request, send_from_directory
 from werkzeug.utils import safe_join
 from flask_restx import Api, Resource, fields, marshal
 
-from dbDao import TodoDAO
+from dbDao import DbDAO
 
 static = safe_join(os.path.dirname(__file__), 'static')
 
@@ -35,7 +35,7 @@ todo = api.model('Todo', {
     'fav': fields.Boolean(description='Whether the task is very special', default=False)
 })
 
-DAO = TodoDAO()
+DAO = DbDAO()
 
 
 @ns.route('/')
