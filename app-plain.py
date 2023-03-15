@@ -26,19 +26,19 @@ def _home():
     """Serve index.html at the root url"""
     print('home')
 
-    return send_from_directory(static, 'index.html')
+    return send_from_directory(static, 'index.html'), 200
 
 
 @app.route('/<path:path>', methods=['GET'])
 def _static(path):
     """Serve content from the static directory"""
     print('static')
-    return send_from_directory(static, path)
+    return send_from_directory(static, path), 200
 
 
 @app.route('/api/todos/', methods=['GET'])
 def list_todos():
-    return jsonify(DAO.get_all())
+    return jsonify(DAO.get_all()), 200
 
 
 @app.route('/api/todos/', methods=['POST'])

@@ -12,11 +12,8 @@ class DbDAO(DaoInterface):
         self.setup_database()
         pass
 
-    """
-    Kjører SQL-spørringen 'statement' med gitte verdi-bindinger 'values'
-    """
-
     def _execute_sql(self, statement, values):
+        """Kjører SQL-spørringen 'statement' med gitte verdi-bindinger 'values' og returnerer"""
         with contextlib.closing(sqlite3.connect(DATABASE_FILE)) as conn:  # auto-closes
             with conn:  # auto-commits
                 conn.row_factory = sqlite3.Row  # wrap for named columns
@@ -26,32 +23,37 @@ class DbDAO(DaoInterface):
                     lastrow = cursor.lastrowid
                     return fetch, lastrow
 
-    """
-    Kjører SQL-spørringen om returnere alt som matcher, bruk til SELECT.
-    """
-
     def _execute_sql_fetchall(self, statement, values):
+        """Kjører SQL-spørringen og returnerer verdiene. Bruk til SELECT og RETURNING."""
         fetch, _ = self._execute_sql(statement, values)
         return fetch
 
-    """
-    Kjører SQL-spørringen og returnerer iden til siste rad. Bruk til INSERT.
-    """
-
     def _execute_sql_lastrowid(self, statement, values):
+        """Kjører SQL-spørringen og returnerer iden til siste rad. Bruk til INSERT."""
         _, lastrow = self._execute_sql(statement, values)
         return lastrow
 
-    def _map_row(self, row):
-        return dict(row)
-
-    def _map_rows(self, rows):
+    def _map_all_rows(self, rows):
+        """Mapper alle rader til dict og returnerer en liste med dicts."""
         return [dict(row) for row in rows]
-    """
-    Opprett tabeller i databasen om database-filen ikke finnes fra før.
-    """
+
+    def _map_single_row(self, row):
+        """Mapper en rad til dict. Kaster exception hvis det er mer enn en rad"""
+        r = self._map_all_rows(row)
+        if len(r) > 1:
+            raise Exception('Expected one row, got ' + str(len(r)))
+        return r[0]
+
+    def get(self, id):
+        """EKSEMPEL: Henter en rad fra todo tabellen basert på id"""
+        todo = self._execute_sql_fetchall('''SELECT id, task, fav FROM todo WHERE id = :id''',
+                                          {'id': id})
+        return self._map_single_row(todo)
+
+    # ---- OPPGAVER ----
 
     def setup_database(self):
+        # OPPGAVE: Skriv SQL som oppretter tabellen todo
         try:
             self._execute_sql('''CREATE TABLE todo (id INTEGER PRIMARY KEY, task TEXT, fav INTEGER)
             ''', {})
@@ -59,34 +61,24 @@ class DbDAO(DaoInterface):
             pass
 
     def get_all(self):
-        # fetch all todos from database
+        # OPPGAVE: Skriv SQL som henter alle rader fra todo tabellen
 
         todos = self._execute_sql_fetchall(
             '''SELECT id, task, fav FROM todo''', {})
-        return self._map_rows(todos)
-
-    def get(self, id):
-
-        # fetch the todo with the given id
-        todo = self._execute_sql('''SELECT id, task, fav FROM todo WHERE id = :id''',
-                                 {'id': id})
-        return self._map_row(todo)
+        return self._map_all_rows(todos)
 
     def insert(self, data):
-        todo = data
         # OPPGAVE: Skriv SQL som setter inn en ny rad i todo tabellen
-        todo_id = self._execute_sql_lastrowid('''
-        INSERT INTO todo (task, fav) VALUES (:task, :fav)
+        inserted = self._execute_sql_fetchall('''
+        INSERT INTO todo (task, fav) VALUES (:task, :fav) RETURNING *
         ''', data)
-
-        todo['id'] = todo_id
-        return todo
+        return self._map_single_row(inserted)
 
     def update(self, id, data):
         # OPPGAVE: Skriv SQL som oppdaterer den gitte raden i tabellen
         data['id'] = id
         self._execute_sql('''
-        UPDATE todo SET task = :task, fav = :fav WHERE id = :id
+        UPDATE todo SET task = COALESCE(:task, task), fav = COALESCE(:fav, fav) WHERE id = :id
         ''', data)
         return data
 
