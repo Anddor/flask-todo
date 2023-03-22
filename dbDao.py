@@ -1,5 +1,4 @@
 import contextlib
-import os
 import sqlite3
 
 from daoInterface import DaoInterface
@@ -24,7 +23,7 @@ class DbDAO(DaoInterface):
                     return fetch, lastrow
 
     def _execute_sql_fetchall(self, statement, values):
-        """Kjører SQL-spørringen og returnerer verdiene. Bruk til SELECT og RETURNING."""
+        """Kjører SQL-spørringen og returnerer verdiene. Bruk til SELECT."""
         fetch, _ = self._execute_sql(statement, values)
         return fetch
 
@@ -69,10 +68,12 @@ class DbDAO(DaoInterface):
 
     def insert(self, data):
         # OPPGAVE: Skriv SQL som setter inn en ny rad i todo tabellen
-        inserted = self._execute_sql_fetchall('''
-        INSERT INTO todo (task, fav) VALUES (:task, :fav) RETURNING *
+        inserted = data
+        id = self._execute_sql_lastrowid('''
+        INSERT INTO todo (task, fav) VALUES (:task, :fav)
         ''', data)
-        return self._map_single_row(inserted)
+        inserted['id'] = id
+        return inserted
 
     def update(self, id, data):
         # OPPGAVE: Skriv SQL som oppdaterer den gitte raden i tabellen
