@@ -6,6 +6,7 @@ from werkzeug.utils import safe_join
 
 from dbDao import DbDAO
 from daoInterface import DaoInterface
+from postgresDao import PostgresDAO
 
 static = safe_join(os.path.dirname(__file__), 'static')
 
@@ -17,6 +18,9 @@ if dao_to_use == 'mem':
     DAO = MemDAO()
 elif dao_to_use == 'db':
     DAO = DbDAO()
+elif dao_to_use == 'postgres':
+    connection_string = os.getenv('POSTGRES_CONNECTION_STRING')
+    DAO = PostgresDAO(connection_string)
 else:
     raise Exception('Unknown dao setting: ' + dao_to_use, dao_to_use)
 
